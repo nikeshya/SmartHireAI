@@ -89,8 +89,9 @@ st.markdown(
 
     div.stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white; border: none; border-radius: 8px; padding: 0.55rem 2.5rem;
-        font-weight: 600; font-size: 0.95rem; transition: all 0.3s;
+        color: white; border: none; border-radius: 8px; padding: 0.5rem 1.8rem;
+        font-weight: 600; font-size: 0.9rem; transition: all 0.3s;
+        white-space: nowrap; min-width: fit-content;
     }
     div.stButton > button:hover {
         transform: translateY(-1px); box-shadow: 0 6px 20px rgba(102,126,234,0.35);
@@ -302,9 +303,7 @@ with tab_query:
         label_visibility="collapsed",
     )
 
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        search_clicked = st.button("🔎  Search", use_container_width=True)
+    search_clicked = st.button("🔎 Search")
 
     # Session state for history
     if "history" not in st.session_state:
