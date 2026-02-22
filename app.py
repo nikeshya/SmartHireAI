@@ -1,8 +1,8 @@
 """
-Streamlit UI for the Resume QA RAG system.
+Streamlit UI for the SmartHire AI system.
 Two sections:
-  1. 📤 Upload Resumes — drag & drop PDF/DOCX/TXT files, auto-parsed and ingested
-  2. 🔍 Ask Questions — query the uploaded resumes with natural language
+  1. Upload Resumes — drag & drop PDF/DOCX/TXT files, auto-parsed and ingested
+  2. Ask Questions — query the uploaded resumes with natural language
 """
 
 from __future__ import annotations
@@ -16,8 +16,8 @@ from config import DATA_CSV_PATH, DEFAULT_TOP_K, RESUME_CATEGORIES, get_settings
 # Page config
 # ---------------------------------------------------------------------------
 st.set_page_config(
-    page_title="SmartHire AI — Intelligent Resume Search",
-    page_icon="🔍",
+    page_title="SmartHire AI",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -106,11 +106,11 @@ st.markdown(
 # Sidebar
 # ---------------------------------------------------------------------------
 with st.sidebar:
-    st.markdown("### ⚙️ Settings")
+    st.markdown("### Settings")
     top_k = st.slider("Number of results (top-K)", 1, 10, DEFAULT_TOP_K)
 
     st.markdown("---")
-    st.markdown("### 📂 Categories")
+    st.markdown("### Categories")
     for cat in RESUME_CATEGORIES:
         st.markdown(f"- {cat}")
 
@@ -124,16 +124,16 @@ with st.sidebar:
             csv_count = len(df)
         except Exception:
             pass
-    st.markdown(f"### 📊 Resumes Loaded: **{csv_count}**")
+    st.markdown(f"### Resumes Loaded: **{csv_count}**")
 
     st.markdown("---")
-    st.markdown("### 🏗️ How It Works")
+    st.markdown("### How It Works")
     st.markdown(
         """
     1. **Upload** resume files (PDF/DOCX/TXT)
     2. AI **auto-parses** name, skills, category
     3. Resumes **embedded** & stored in Pinecone
-    4. **Ask questions** in natural language!
+    4. **Ask questions** in natural language
     """
     )
 
@@ -141,10 +141,10 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 # Header
 # ---------------------------------------------------------------------------
-st.markdown('<div class="hero-title">🧠 SmartHire AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">SmartHire AI</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="hero-subtitle">'
-    "Upload resumes → AI auto-parses & indexes them → Ask anything about candidates in natural language"
+    "Upload resumes, AI auto-parses & indexes them, ask anything about candidates in natural language"
     "</div>",
     unsafe_allow_html=True,
 )
@@ -152,12 +152,12 @@ st.markdown(
 # ---------------------------------------------------------------------------
 # Tab layout: Upload | Ask Questions
 # ---------------------------------------------------------------------------
-tab_upload, tab_query = st.tabs(["📤 Upload Resumes", "🔍 Ask Questions"])
+tab_upload, tab_query = st.tabs(["Upload Resumes", "Ask Questions"])
 
 # ============================= UPLOAD TAB =================================
 with tab_upload:
     st.markdown("### Drop your resume files here")
-    st.markdown("Supported formats: **PDF**, **DOCX**, **TXT** — upload as many as you want!")
+    st.markdown("Supported formats: **PDF**, **DOCX**, **TXT** — upload as many as you want.")
 
     uploaded_files = st.file_uploader(
         "Upload resume files",
@@ -169,7 +169,7 @@ with tab_upload:
     if uploaded_files:
         st.markdown(f"**{len(uploaded_files)} file(s) selected**")
 
-        if st.button("🚀 Process & Ingest All Resumes", use_container_width=True):
+        if st.button("Process & Ingest All Resumes", use_container_width=True):
             try:
                 settings = get_settings()
                 from openai import OpenAI
@@ -240,11 +240,11 @@ with tab_upload:
 
                         st.markdown(
                             f"""<div class="resume-card">
-                                <div class="card-name">✅ {record.name}</div>
+                                <div class="card-name">{record.name} — Ingested</div>
                                 <div class="card-meta">
                                     <span class="badge badge-category">{record.category}</span>
                                     <span class="badge badge-exp">{record.experience_years} yrs</span>
-                                    <span class="badge badge-success">Ingested</span>
+                                    <span class="badge badge-success">Done</span>
                                 </div>
                                 <div class="card-skills"><strong>Skills:</strong> {record.skills}</div>
                             </div>""",
@@ -252,7 +252,7 @@ with tab_upload:
                         )
 
                     except Exception as e:
-                        st.error(f"❌ Failed to process {uploaded_file.name}: {e}")
+                        st.error(f"Failed to process {uploaded_file.name}: {e}")
 
                 progress.progress(1.0, text="Done!")
 
@@ -264,21 +264,21 @@ with tab_upload:
                     all_df.to_csv(DATA_CSV_PATH, index=False)
 
                 st.success(
-                    f"🎉 Done! {success_count}/{len(uploaded_files)} resumes processed, "
+                    f"Done! {success_count}/{len(uploaded_files)} resumes processed, "
                     f"embedded, and stored in Pinecone. Total resumes in system: "
                     f"{len(existing_records) + len(new_records)}"
                 )
-                st.info("👉 Now go to the **Ask Questions** tab and start querying!")
+                st.info("Now go to the **Ask Questions** tab and start querying.")
 
             except ValueError as e:
-                st.error(f"⚠️ Configuration Error: {e}")
+                st.error(f"Configuration Error: {e}")
             except Exception as e:
-                st.error(f"❌ Error: {e}")
+                st.error(f"Error: {e}")
                 st.exception(e)
 
     # Show current CSV contents
     st.markdown("---")
-    st.markdown("### 📋 Currently Loaded Resumes")
+    st.markdown("### Currently Loaded Resumes")
     if DATA_CSV_PATH.exists():
         try:
             df = pd.read_csv(DATA_CSV_PATH)
@@ -286,11 +286,11 @@ with tab_upload:
                 display_df = df[["id", "name", "category", "skills", "experience_years"]].copy()
                 st.dataframe(display_df, use_container_width=True, hide_index=True)
             else:
-                st.info("No resumes loaded yet. Upload some files above!")
+                st.info("No resumes loaded yet. Upload some files above.")
         except Exception:
-            st.info("No resumes loaded yet. Upload some files above!")
+            st.info("No resumes loaded yet. Upload some files above.")
     else:
-        st.info("No resumes loaded yet. Upload some files above!")
+        st.info("No resumes loaded yet. Upload some files above.")
 
 
 # ============================= QUERY TAB ==================================
@@ -303,7 +303,7 @@ with tab_query:
         label_visibility="collapsed",
     )
 
-    search_clicked = st.button("🔎 Search")
+    search_clicked = st.button("Search")
 
     # Session state for history
     if "history" not in st.session_state:
@@ -311,7 +311,7 @@ with tab_query:
 
     if search_clicked and query:
         try:
-            with st.spinner("🧠 Classifying → Searching → Generating answer..."):
+            with st.spinner("Classifying, searching, generating answer..."):
                 from pipeline import run_pipeline
 
                 result = run_pipeline(query, top_k=top_k)
@@ -319,7 +319,7 @@ with tab_query:
             st.session_state.history.append(result)
 
             # -- Answer --
-            st.markdown("### 💡 Answer")
+            st.markdown("### Answer")
             st.markdown(
                 f'<div class="answer-box">{result.answer.answer}</div>',
                 unsafe_allow_html=True,
@@ -333,7 +333,7 @@ with tab_query:
             )
 
             # -- Retrieved documents --
-            st.markdown("### 📄 Retrieved Resumes")
+            st.markdown("### Retrieved Resumes")
             if not result.retrieved_documents:
                 st.info("No matching resumes found for this category.")
             else:
@@ -350,38 +350,38 @@ with tab_query:
                         </div>""",
                         unsafe_allow_html=True,
                     )
-                    with st.expander(f"📝 Full resume — {doc.name}"):
+                    with st.expander(f"Full resume — {doc.name}"):
                         st.write(doc.resume_text)
 
             # -- Pipeline trace --
-            st.markdown("### 🔬 Pipeline Trace")
+            st.markdown("### Pipeline Trace")
             trace = result.trace
             st.markdown(
                 f"""<div class="trace-container">
-                    <div class="trace-row"><span class="trace-label">⏱️ Total Time</span>
+                    <div class="trace-row"><span class="trace-label">Total Time</span>
                         <span class="trace-value-highlight">{trace.total_time_ms:.0f} ms</span></div>
-                    <div class="trace-row"><span class="trace-label">🏷️ Classification</span>
+                    <div class="trace-row"><span class="trace-label">Classification</span>
                         <span class="trace-value">{trace.classification_time_ms:.0f} ms</span></div>
-                    <div class="trace-row"><span class="trace-label">🧬 Embedding</span>
+                    <div class="trace-row"><span class="trace-label">Embedding</span>
                         <span class="trace-value">{trace.embedding_time_ms:.0f} ms</span></div>
-                    <div class="trace-row"><span class="trace-label">🔍 Retrieval</span>
+                    <div class="trace-row"><span class="trace-label">Retrieval</span>
                         <span class="trace-value">{trace.retrieval_time_ms:.0f} ms</span></div>
-                    <div class="trace-row"><span class="trace-label">✍️ Generation</span>
+                    <div class="trace-row"><span class="trace-label">Generation</span>
                         <span class="trace-value">{trace.generation_time_ms:.0f} ms</span></div>
-                    <div class="trace-row"><span class="trace-label">📊 Docs Found</span>
+                    <div class="trace-row"><span class="trace-label">Docs Found</span>
                         <span class="trace-value">{trace.documents_found} / {trace.top_k}</span></div>
-                    <div class="trace-row"><span class="trace-label">🧠 Models</span>
+                    <div class="trace-row"><span class="trace-label">Models</span>
                         <span class="trace-value">{trace.embedding_model} + {trace.llm_model}</span></div>
-                    <div class="trace-row"><span class="trace-label">📤 Tokens</span>
+                    <div class="trace-row"><span class="trace-label">Tokens</span>
                         <span class="trace-value">{result.answer.prompt_tokens} prompt + {result.answer.completion_tokens} completion</span></div>
                 </div>""",
                 unsafe_allow_html=True,
             )
 
         except ValueError as e:
-            st.error(f"⚠️ Configuration Error: {e}")
+            st.error(f"Configuration Error: {e}")
         except Exception as e:
-            st.error(f"❌ Pipeline Error: {e}")
+            st.error(f"Pipeline Error: {e}")
             st.exception(e)
 
     elif search_clicked and not query:
@@ -390,7 +390,7 @@ with tab_query:
     # -- History --
     if len(st.session_state.history) > 1:
         st.markdown("---")
-        st.markdown("### 🕐 Query History")
+        st.markdown("### Query History")
         for i, past in enumerate(reversed(st.session_state.history[:-1]), 1):
             with st.expander(f"Query {i}: {past.query[:60]}..."):
                 st.markdown(f"**Category:** {past.classification.category}")
